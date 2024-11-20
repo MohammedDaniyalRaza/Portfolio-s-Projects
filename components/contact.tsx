@@ -30,6 +30,13 @@ const Contact = () => {
     resolver: zodResolver(formSchema),
   });
 
+  type FormData = {
+    [key: string]: string;
+    name: string;
+    email: string;
+    message: string;
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
   
