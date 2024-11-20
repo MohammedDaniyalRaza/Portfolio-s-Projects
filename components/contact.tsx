@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ButtonHTMLAttributes, useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,13 +39,14 @@ const Contact = () => {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    setIsSuccess(false);
   
     try {
       // Your email-sending logic
       await emailjs.send(
         "service_f0s2jrd",
         "template_v24v6ib",
-        data,
+        data as  Record<string, unknown>,
         "jmmOlFZ3_E1n0JyTt"
       );
   
