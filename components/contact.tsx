@@ -30,29 +30,23 @@ const Contact = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-
+  
     try {
-      const response = await emailjs.send(
-        "service_f0s2jrd", // My EmailJS Service ID
-        "template_v24v6ib", // My EmailJS Template ID
-        {
-          name: data.name,
-          email: data.email,
-          message: data.message,
-        },
-        "jmmOlFZ3_E1n0JyTt" // My EmailJS Private Key
+      // Your email-sending logic
+      await emailjs.send(
+        "service_f0s2jrd",
+        "template_v24v6ib",
+        data,
+        "jmmOlFZ3_E1n0JyTt"
       );
-
-      if (response.status === 200) {
-        setIsSuccess(true);
-        reset();
-        setTimeout(() => setIsSuccess(false), 3000);
-      }
+  
+      setIsSuccess(true);
+      reset();
+      setTimeout(() => setIsSuccess(false), 3000);
     } catch (error) {
       console.error("Error sending email:", error);
-      alert("Failed to send message. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
