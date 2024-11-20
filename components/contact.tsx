@@ -2,7 +2,7 @@
 
 import { ButtonHTMLAttributes, useState } from "react";
 import { motion } from "framer-motion";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import emailjs from "emailjs-com"; // Import EmailJS
@@ -17,48 +17,42 @@ const formSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
-const Contact = () => {
+type FormData = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm({
-    resolver: zodResolver(formSchema),
+  
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
+      resolver: zodResolver(formSchema),
   });
 
-  type FormData = {
-    [key: string]: string;
-    name: string;
-    email: string;
-    message: string;
-  };
-
-  const onSubmit = async (data: FormData) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsSubmitting(true);
     setIsSuccess(false);
-  
     try {
-      // Your email-sending logic
-      await emailjs.send(
-        "service_f0s2jrd",
-        "template_v24v6ib",
-        data as  Record<string, unknown>,
-        "jmmOlFZ3_E1n0JyTt"
-      );
-  
-      setIsSuccess(true);
-      reset();
-      setTimeout(() => setIsSuccess(false), 3000);
+        // Type assertion to FormData
+        const formData = data as FormData; 
+        await emailjs.send(
+            "service_f0s2jrd",
+            "template_v24v6ib",
+            formData,
+            "jmmOlFZ3_E1n0JyTt"
+        );
+        setIsSuccess(true);
+        reset();
+        setTimeout(() => setIsSuccess(false), 3000);
     } catch (error) {
-      console.error("Error sending email:", error);
+        console.error("Error sending email:", error);
+        alert("There was an error sending your message. Please try again later.");
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
-  };
+};
 
   return (
     <section id="contact" className="py-20 bg-muted/30">
@@ -94,64 +88,64 @@ const Contact = () => {
 
             {/* Contact Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
+            <div>
                 <Input
-                  placeholder="Your Name"
-                  {...register("name")}
-                  className={errors.name ? "border-red-500" : ""}
+                    placeholder="Your Name"
+                    {...register("name")}
+                    className={errors.name ? "border-red-500" : ""}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.name.message}
-                  </p>
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.name.message}
+                    </p>
                 )}
-              </div>
+            </div>
 
-              <div>
+            <div>
                 <Input
-                  type="email"
-                  placeholder="Your Email"
-                  {...register("email")}
-                  className={errors.email ? "border-red-500" : ""}
+                    type="email"
+                    placeholder="Your Email"
+                    {...register("email")}
+                    className={errors.email ? "border-red-500" : ""}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.email.message}
-                  </p>
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.email.message}
+                    </p>
                 )}
-              </div>
+            </div>
 
-              <div>
+            <div>
                 <Textarea
-                  placeholder="Your Message"
-                  {...register("message")}
-                  className={errors.message ? "border-red-500" : ""}
-                  rows={5}
+                    placeholder="Your Message"
+                    {...register("message")}
+                    className={errors.message ? "border-red-500" : ""}
+                    rows={5}
                 />
                 {errors.message && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.message.message}
-                  </p>
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.message.message}
+                    </p>
                 )}
-              </div>
+            </div>
 
-              <Button
+            <Button
                 type="submit"
                 className="w-full"
                 disabled={isSubmitting}
-              >
+            >
                 {isSubmitting ? (
-                  "Sending..."
+                    "Sending..."
                 ) : isSuccess ? (
-                  "Message Sent!"
+                    "Message Sent!"
                 ) : (
-                  <>
-                    Send Message
-                    <Send className="ml-2" size={16} />
-                  </>
+                    <>
+                        Send Message
+                        <Send className="ml-2" size={16} />
+                    </>
                 )}
-              </Button>
-            </form>
+            </Button>
+        </form>
           </div>
         </motion.div>
       </div>
@@ -159,4 +153,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default ContactForm;
